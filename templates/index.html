@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+
+{% block title %}FairUGC | Creator Rate Calculator{% endblock %}
+
+{% block styles %}
+<style>
+    :root {
+        --primary-color: #6366f1;
+        /* ... keep existing styles ... */
+    }
+    /* ... rest of CSS ... */
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="hero-pattern"></div>
+    <button class="theme-toggle" id="themeToggle">
+        <i class="moon icon"></i> Dark Mode
+    </button>
+    <div class="ui container center aligned relative">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">
+            <i class="camera retro icon"></i>
+        </div>
+        <h1 class="ui header inverted" style="font-size: 2.5rem; margin-top:0;">
+            FairUGC
+            <div class="sub header" style="color: rgba(255,255,255,0.9); font-size: 1.2rem; margin-top: 10px;">
+                Calculate Your Fair Creator Rates Instantly.
+                <br>Stop guessing. Start earning what you're worth.
+            </div>
+        </h1>
+    </div>
+</div>
+
+<div class="ui container" style="max-width: 800px; padding-bottom: 4rem;">
+
+    <!-- Calculator Card -->
+    <div class="modern-card">
+        <h3 class="ui header" style="color: var(--text-main);">
+            <i class="calculator icon" style="color: var(--primary-color);"></i>
+            <div class="content">
+                Rate Calculator
+                <div class="sub header" style="color: var(--text-muted);">Change values to see instant updates.</div>
+            </div>
+        </h3>
+        
+        <form class="ui form" id="calcForm">
+            <!-- Content Type -->
+            <div class="field">
+                <label>1. What are you creating?</label>
+                <div class="ui fluid search selection dropdown" id="contentTypeDropdown">
+                    <input type="hidden" name="content_type" id="contentType" value="video">
+                    <i class="dropdown icon"></i>
+                    <div class="default text">Select Content Type</div>
+                    <div class="menu">
+                        <div class="item" data-value="video"><i class="video icon"></i> UGC Video (15-60s)</div>
+                        <div class="item" data-value="photo"><i class="camera icon"></i> Photo Bundle (3 Images)</div>
+                        <div class="item" data-value="testimonial"><i class="comment alternate icon"></i> Simple Testimonial</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Experience Level (Segmented Control) -->
+            <div class="field">
+                <label>2. Your Experience Level</label>
+                <div class="segmented-control" id="experienceControl">
+                    <button type="button" class="segmented-btn active" data-value="beginner">Beginner</button>
+                    <button type="button" class="segmented-btn" data-value="intermediate">Intermediate</button>
+                    <button type="button" class="segmented-btn" data-value="pro">Pro</button>
+                </div>
+                <div class="field-helper" id="expHelper">Beginner: Portfolio building, under 6 months exp.</div>
+            </div>
+
+            <!-- Niche -->
+            <div class="field">
+                <label>3. Brand Niche</label>
+                <div class="ui fluid search selection dropdown" id="nicheDropdown">
+                    <input type="hidden" name="niche" id="niche" value="general">
+                    <i class="dropdown icon"></i>
+                    <div class="default text">Select Niche</div>
+                    <div class="menu">
+                        <div class="item" data-value="general"><div class="ui empty circular label"></div> General / Lifestyle</div>
+                        <div class="item" data-value="beauty"><div class="ui pink empty circular label"></div> Beauty / Skincare</div>
+                        <div class="item" data-value="tech_finance"><div class="ui blue empty circular label"></div> Tech / Finance / SaaS</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stackable Usage Rights -->
+            <div class="field">
+                <label>4. Usage Rights (Select all that apply)</label>
+                <div class="ui segment" style="background: var(--bg-color); border: 1px solid var(--border-color);">
+                    <div class="ui relaxed list" id="usageControl">
+                        <div class="item">
+                            <div class="ui toggle checkbox">
+                                <input type="checkbox" name="usage" value="ads_30">
+                                <label style="color: var(--text-main);">Paid Ads (30 Days)</label>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="ui toggle checkbox">
+                                <input type="checkbox" name="usage" value="ads_90">
+                                <label style="color: var(--text-main);">Paid Ads (90 Days)</label>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="ui toggle checkbox">
+                                <input type="checkbox" name="usage" value="exclusivity">
+                                <label style="color: var(--text-main);">Exclusivity (No competitors)</label>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="ui toggle checkbox">
+                                <input type="checkbox" name="usage" value="whitelisting">
+                                <label style="color: var(--text-main);">Whitelisting (Post from Brand Account)</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="field-helper">Standard Organic rights are included by default.</div>
+            </div>
+            
+            <!-- Hidden Submit for Enter Key -->
+            <input type="submit" style="display: none;">
+        </form>
+    </div>
+
+    <!-- Results Section -->
+    <div class="modern-card" id="resultSegment" style="display: none; margin-top: 2rem; border-color: var(--success-color);">
+        <div class="ui stackable grid middle aligned">
+            <div class="eight wide column">
+                <div class="ui tiny header" style="text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px;">Estimated Range</div>
+                <div style="font-size: 3.5rem; line-height: 1;" class="result-gradient-text">
+                    $<span id="minPrice">0</span> - $<span id="maxPrice">0</span>
+                </div>
+                <p style="color: var(--text-muted); margin-top: 10px;">Based on your niche & usage rights.</p>
+            </div>
+            <div class="eight wide column right aligned computer only">
+                <button class="ui button basic circular" id="downloadQuoteBtn">
+                    <i class="file pdf outline icon"></i> Download Quote
+                </button>
+            </div>
+            <!-- Mobile only button duplicate -->
+            <div class="sixteen wide column mobile only center aligned">
+                <button class="ui button basic circular fluid" id="downloadQuoteBtnMobile">
+                    <i class="file pdf outline icon"></i> Download Quote
+                </button>
+            </div>
+        </div>
+
+        <div class="ui divider"></div>
+
+        <!-- Pitch Generator -->
+        <h4 class="ui header" style="color: var(--text-main);">
+            <i class="magic icon" style="color: var(--primary-color);"></i>
+            Pitch Generator
+        </h4>
+        
+        <div class="ui form">
+            <div class="three fields">
+                <div class="field">
+                    <input type="text" id="pitchBrand" placeholder="Brand Name (e.g. Nike)">
+                </div>
+                <div class="field">
+                    <input type="text" id="pitchProduct" placeholder="Product Type (e.g. Sneakers)">
+                </div>
+                <div class="field">
+                     <div class="ui selection dropdown" id="moodDropdown">
+                        <input type="hidden" name="mood" id="pitchMood" value="professional">
+                        <i class="dropdown icon"></i>
+                        <div class="default text">Select Mood</div>
+                        <div class="menu">
+                            <div class="item" data-value="professional">Professional</div>
+                            <div class="item" data-value="casual">Casual / Friendly</div>
+                            <div class="item" data-value="bold">Bold / High Energy</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="ui basic fluid button" id="generatePitchBtn" style="border-radius: 12px; color: var(--text-main); border-color: var(--border-color);">
+                Draft Email for Brand
+            </button>
+        </div>
+
+        <div class="ui form" id="pitchArea" style="display: none; margin-top: 1rem;">
+            <div class="field">
+                <textarea rows="8" id="pitchText"></textarea>
+            </div>
+            <div class="field">
+                <div class="ui action input fluid">
+                    <input type="email" placeholder="Enter email to save this calculation..." id="leadEmail">
+                    <button class="ui button violet" id="saveLeadBtn">Save Result</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="/static/js/main.js"></script>
+{% endblock %}

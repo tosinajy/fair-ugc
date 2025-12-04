@@ -1,0 +1,258 @@
+{% extends 'base.html' %}
+
+{% block styles %}
+<style>
+    .admin-container { padding: 20px; }
+    .pagination-container { margin-top: 20px; text-align: center; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ui inverted menu">
+  <div class="header item">FairUGC Admin</div>
+  <a class="item {{ 'active' if active_tab == 'dashboard' }}" href="?tab=dashboard">Dashboard</a>
+  <a class="item {{ 'active' if active_tab == 'users' }}" href="?tab=users">Users</a>
+  <a class="item {{ 'active' if active_tab == 'roles' }}" href="?tab=roles">Roles</a>
+  <a class="item {{ 'active' if active_tab == 'pricing' }}" href="?tab=pricing">Pricing Engine</a>
+  <div class="right menu">
+    <div class="item">
+        Hello, {{ current_user.username }} ({{ current_user.role.name }})
+    </div>
+    <a class="item" href="{{ url_for('logout') }}">Logout</a>
+  </div>
+</div>
+
+<div class="admin-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="ui {{ 'negative' if category == 'error' else 'positive' }} message">
+              <p>{{ message }}</p>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- DASHBOARD TAB -->
+    {% if active_tab == 'dashboard' %}
+    <div class="ui grid">
+        <div class="four wide column">
+            <div class="ui statistic">
+                <div class="value">{{ calc_count }}</div>
+                <div class="label">Total Calculations</div>
+            </div>
+        </div>
+        <div class="four wide column">
+            <div class="ui statistic">
+                <div class="value">{{ lead_count }}</div>
+                <div class="label">Leads Captured</div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- USERS TAB (PAGINATED) -->
+    {% if active_tab == 'users' %}
+    <h2 class="ui header">User Management</h2>
+    <div class="ui segment">
+        <form class="ui form" action="{{ url_for('add_user') }}" method="POST">
+            <h4 class="ui dividing header">Add New User</h4>
+            <div class="fields">
+                <div class="field">
+                    <label>Username</label>
+                    <input type="text" name="username" required>
+                </div>
+                <div class="field">
+                    <label>Password</label>
+                    <input type="password" name="password" required>
+                </div>
+                <div class="field">
+                    <label>Role</label>
+                    <select class="ui dropdown" name="role_id">
+                        {% for role in roles %}
+                        <option value="{{ role.id }}">{{ role.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="field">
+                    <label>&nbsp;</label>
+                    <button class="ui blue button" type="submit">Create User</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <table class="ui celled table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Role</th>
+                <th>Updated By</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if users_paginated %}
+                {% for user in users_paginated.items %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.role.name }}</td>
+                    <td>{{ user.updated_by }}</td>
+                    <td>
+                        {% if user.id != current_user.id %}
+                        <a href="{{ url_for('delete_user', user_id=user.id) }}" class="ui mini red button">Delete</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            {% endif %}
+        </tbody>
+    </table>
+    
+    <!-- Pagination Controls -->
+    {% if users_paginated and users_paginated.pages > 1 %}
+    <div class="pagination-container">
+        <div class="ui pagination menu">
+            <a class="item {{ 'disabled' if not users_paginated.has_prev }}" href="{{ url_for('admin_dashboard', tab='users', page=users_paginated.prev_num) }}">
+                Prev
+            </a>
+            {% for page_num in users_paginated.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                {% if page_num %}
+                    <a class="item {{ 'active' if page_num == users_paginated.page }}" href="{{ url_for('admin_dashboard', tab='users', page=page_num) }}">
+                        {{ page_num }}
+                    </a>
+                {% else %}
+                    <span class="item disabled">...</span>
+                {% endif %}
+            {% endfor %}
+            <a class="item {{ 'disabled' if not users_paginated.has_next }}" href="{{ url_for('admin_dashboard', tab='users', page=users_paginated.next_num) }}">
+                Next
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    {% endif %}
+
+    <!-- ROLES TAB (PAGINATED) -->
+    {% if active_tab == 'roles' %}
+    <h2 class="ui header">Role Management</h2>
+    
+    <div class="ui segment">
+        <form class="ui form" action="{{ url_for('add_role') }}" method="POST">
+            <h4 class="ui dividing header">Add New Role</h4>
+            <div class="fields">
+                <div class="field">
+                    <label>Role Name</label>
+                    <input type="text" name="name" placeholder="e.g. Moderator" required>
+                </div>
+            </div>
+            <div class="grouped fields">
+                <label>Permissions:</label>
+                {% for perm in permissions %}
+                <div class="field">
+                    <div class="ui checkbox">
+                        <input type="checkbox" name="permissions" value="{{ perm.id }}">
+                        <label>{{ perm.description }} ({{ perm.slug }})</label>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <button class="ui blue button" type="submit">Create Role</button>
+        </form>
+    </div>
+
+    <table class="ui celled table">
+        <thead>
+            <tr>
+                <th>Role</th>
+                <th>Permissions</th>
+                <th>Updated By</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if roles_paginated %}
+                {% for role in roles_paginated.items %}
+                <tr>
+                    <td>{{ role.name }}</td>
+                    <td>
+                        {% for perm in role.permissions %}
+                            <div class="ui tiny label">{{ perm.slug }}</div>
+                        {% endfor %}
+                    </td>
+                    <td>{{ role.updated_by }}</td>
+                    <td>
+                        {% if role.name != 'admin' %}
+                        <a href="{{ url_for('delete_role', role_id=role.id) }}" class="ui mini red button">Delete</a>
+                        {% else %}
+                        <span class="ui disabled label">System</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            {% endif %}
+        </tbody>
+    </table>
+
+    <!-- Pagination Controls (Roles) -->
+    {% if roles_paginated and roles_paginated.pages > 1 %}
+    <div class="pagination-container">
+        <div class="ui pagination menu">
+            <a class="item {{ 'disabled' if not roles_paginated.has_prev }}" href="{{ url_for('admin_dashboard', tab='roles', page=roles_paginated.prev_num) }}">Prev</a>
+            <span class="item disabled">Page {{ roles_paginated.page }} of {{ roles_paginated.pages }}</span>
+            <a class="item {{ 'disabled' if not roles_paginated.has_next }}" href="{{ url_for('admin_dashboard', tab='roles', page=roles_paginated.next_num) }}">Next</a>
+        </div>
+    </div>
+    {% endif %}
+
+    {% endif %}
+
+    <!-- PRICING TAB -->
+    {% if active_tab == 'pricing' %}
+    <h2 class="ui header">Dynamic Pricing Configuration</h2>
+    <div class="ui warning message">
+        <i class="attention icon"></i> Changing these values immediately affects all public calculations.
+    </div>
+    <form action="{{ url_for('update_pricing') }}" method="POST" class="ui form">
+        <table class="ui definition table">
+            <thead>
+                <tr><th>Variable</th><th>Value</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+                {% for conf in pricing_configs %}
+                <tr>
+                    <td>{{ conf.key }}</td>
+                    <td>
+                        <div class="ui input fluid">
+                            <input type="number" step="0.01" name="conf_{{ conf.key }}" value="{{ conf.value }}">
+                        </div>
+                    </td>
+                    <td>{{ conf.description }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot class="full-width">
+                <tr>
+                    <th></th>
+                    <th colspan="2">
+                        <button class="ui primary button" type="submit">Save Changes</button>
+                    </th>
+                </tr>
+            </tfoot>
+        </table>
+    </form>
+    {% endif %}
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $('.ui.dropdown').dropdown();
+    $('.ui.checkbox').checkbox();
+</script>
+{% endblock %}

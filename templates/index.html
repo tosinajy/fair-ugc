@@ -3,205 +3,244 @@
 {% block title %}FairUGC | Creator Rate Calculator{% endblock %}
 
 {% block styles %}
-<style>
-    :root {
-        --primary-color: #6366f1;
-        /* ... keep existing styles ... */
-    }
-    /* ... rest of CSS ... */
-</style>
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 {% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<div class="hero-section">
-    <div class="hero-pattern"></div>
-    <button class="theme-toggle" id="themeToggle">
-        <i class="moon icon"></i> Dark Mode
-    </button>
-    <div class="ui container center aligned relative">
-        <div style="font-size: 3rem; margin-bottom: 1rem;">
-            <i class="camera retro icon"></i>
+<nav class="app-navbar">
+    <div class="nav-content">
+        <div class="nav-brand">
+            <div class="logo-icon"><i class="fas fa-calculator"></i></div>
+            <span class="brand-text">FairUGC</span>
         </div>
-        <h1 class="ui header inverted" style="font-size: 2.5rem; margin-top:0;">
-            FairUGC
-            <div class="sub header" style="color: rgba(255,255,255,0.9); font-size: 1.2rem; margin-top: 10px;">
-                Calculate Your Fair Creator Rates Instantly.
-                <br>Stop guessing. Start earning what you're worth.
-            </div>
-        </h1>
+        <button class="theme-toggle-btn" id="themeToggle" title="Toggle Dark Mode">
+            <i class="fas fa-moon"></i>
+        </button>
     </div>
-</div>
+</nav>
 
-<div class="ui container" style="max-width: 800px; padding-bottom: 4rem;">
-
-    <!-- Calculator Card -->
-    <div class="modern-card">
-        <h3 class="ui header" style="color: var(--text-main);">
-            <i class="calculator icon" style="color: var(--primary-color);"></i>
-            <div class="content">
-                Rate Calculator
-                <div class="sub header" style="color: var(--text-muted);">Change values to see instant updates.</div>
-            </div>
-        </h3>
+<div class="main-container">
+    
+    <div class="input-panel">
         
-        <form class="ui form" id="calcForm">
-            <!-- Content Type -->
-            <div class="field">
-                <label>1. What are you creating?</label>
-                <div class="ui fluid search selection dropdown" id="contentTypeDropdown">
-                    <input type="hidden" name="content_type" id="contentType" value="video">
-                    <i class="dropdown icon"></i>
-                    <div class="default text">Select Content Type</div>
-                    <div class="menu">
-                        <div class="item" data-value="video"><i class="video icon"></i> UGC Video (15-60s)</div>
-                        <div class="item" data-value="photo"><i class="camera icon"></i> Photo Bundle (3 Images)</div>
-                        <div class="item" data-value="testimonial"><i class="comment alternate icon"></i> Simple Testimonial</div>
-                    </div>
-                </div>
-            </div>
+        <div class="panel-intro">
+            <h1>Rate Calculator</h1>
+            <p>Define your project specs to generate a fair market baseline.</p>
+        </div>
 
-            <!-- Experience Level (Segmented Control) -->
-            <div class="field">
-                <label>2. Your Experience Level</label>
-                <div class="segmented-control" id="experienceControl">
-                    <button type="button" class="segmented-btn active" data-value="beginner">Beginner</button>
-                    <button type="button" class="segmented-btn" data-value="intermediate">Intermediate</button>
-                    <button type="button" class="segmented-btn" data-value="pro">Pro</button>
-                </div>
-                <div class="field-helper" id="expHelper">Beginner: Portfolio building, under 6 months exp.</div>
-            </div>
-
-            <!-- Niche -->
-            <div class="field">
-                <label>3. Brand Niche</label>
-                <div class="ui fluid search selection dropdown" id="nicheDropdown">
-                    <input type="hidden" name="niche" id="niche" value="general">
-                    <i class="dropdown icon"></i>
-                    <div class="default text">Select Niche</div>
-                    <div class="menu">
-                        <div class="item" data-value="general"><div class="ui empty circular label"></div> General / Lifestyle</div>
-                        <div class="item" data-value="beauty"><div class="ui pink empty circular label"></div> Beauty / Skincare</div>
-                        <div class="item" data-value="tech_finance"><div class="ui blue empty circular label"></div> Tech / Finance / SaaS</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Stackable Usage Rights -->
-            <div class="field">
-                <label>4. Usage Rights (Select all that apply)</label>
-                <div class="ui segment" style="background: var(--bg-color); border: 1px solid var(--border-color);">
-                    <div class="ui relaxed list" id="usageControl">
-                        <div class="item">
-                            <div class="ui toggle checkbox">
-                                <input type="checkbox" name="usage" value="ads_30">
-                                <label style="color: var(--text-main);">Paid Ads (30 Days)</label>
-                            </div>
-                        </div>
-                        <div class="item">
-                            <div class="ui toggle checkbox">
-                                <input type="checkbox" name="usage" value="ads_90">
-                                <label style="color: var(--text-main);">Paid Ads (90 Days)</label>
-                            </div>
-                        </div>
-                        <div class="item">
-                            <div class="ui toggle checkbox">
-                                <input type="checkbox" name="usage" value="exclusivity">
-                                <label style="color: var(--text-main);">Exclusivity (No competitors)</label>
-                            </div>
-                        </div>
-                        <div class="item">
-                            <div class="ui toggle checkbox">
-                                <input type="checkbox" name="usage" value="whitelisting">
-                                <label style="color: var(--text-main);">Whitelisting (Post from Brand Account)</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="field-helper">Standard Organic rights are included by default.</div>
-            </div>
+        <form id="calcForm" class="wizard-form">
             
-            <!-- Hidden Submit for Enter Key -->
-            <input type="submit" style="display: none;">
+            <div class="wizard-step">
+                <div class="step-header">
+                    <span class="step-badge">1/4</span>
+                    <span class="step-label">Content Type</span>
+                </div>
+                <div class="step-body">
+                    <input type="hidden" id="contentType" value="video_1">
+                    <div class="pill-grid">
+                        <button type="button" class="type-pill active" data-value="video_1">
+                            <div class="pill-icon"><i class="fas fa-video"></i></div>
+                            <div class="pill-text">
+                                <span class="title">1 Video</span>
+                                <span class="desc">Standard 15-60s</span>
+                            </div>
+                        </button>
+                        <button type="button" class="type-pill" data-value="video_3">
+                            <div class="pill-icon"><i class="fas fa-layer-group"></i></div>
+                            <div class="pill-text">
+                                <span class="title">3 Bundle</span>
+                                <span class="desc">Hook testing</span>
+                            </div>
+                        </button>
+                        <button type="button" class="type-pill" data-value="photos_5">
+                            <div class="pill-icon"><i class="fas fa-camera"></i></div>
+                            <div class="pill-text">
+                                <span class="title">5 Photos</span>
+                                <span class="desc">Static assets</span>
+                            </div>
+                        </button>
+                        <button type="button" class="type-pill" data-value="video_1_hooks_3">
+                            <div class="pill-icon"><i class="fas fa-random"></i></div>
+                            <div class="pill-text">
+                                <span class="title">Vid + Hooks</span>
+                                <span class="desc">1 body, 3 intros</span>
+                            </div>
+                        </button>
+                        <button type="button" class="type-pill" data-value="raw">
+                            <div class="pill-icon"><i class="fas fa-file-video"></i></div>
+                            <div class="pill-text">
+                                <span class="title">Raw Footage</span>
+                                <span class="desc">Unedited files</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="wizard-step">
+                <div class="step-header">
+                    <span class="step-badge">2/4</span>
+                    <span class="step-label">Brand Niche</span>
+                </div>
+                <div class="step-body">
+                    <select id="nicheSelect" placeholder="Select industry..." autocomplete="off">
+                        <option value="lifestyle">☕ General Lifestyle / Vlogs</option>
+                        <option value="beauty">💄 Beauty, Skincare & Fashion</option>
+                        <option value="health">🧘‍♀️ Health & Wellness</option>
+                        <option value="home">🏠 Home, Kitchen & Pets</option>
+                        <option value="tech">💻 Tech, Apps & SaaS</option>
+                        <option value="finance">📈 Finance & Business</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="wizard-step">
+                <div class="step-header">
+                    <span class="step-badge">3/4</span>
+                    <span class="step-label">Creator Level</span>
+                </div>
+                <div class="step-body">
+                    <div class="segmented-control">
+                        <button type="button" class="segment-btn active" data-value="beginner">
+                            <span class="seg-label">Beginner</span>
+                            <span class="seg-sub">&lt; 1 Year</span>
+                        </button>
+                        <button type="button" class="segment-btn" data-value="intermediate">
+                            <span class="seg-label">Intermediate</span>
+                            <span class="seg-sub">1-3 Years</span>
+                        </button>
+                        <button type="button" class="segment-btn" data-value="pro">
+                            <span class="seg-label">Pro</span>
+                            <span class="seg-sub">3+ Years</span>
+                        </button>
+                    </div>
+                    <div class="helper-text" id="expDetail">
+                        <i class="fas fa-info-circle"></i> Best for creators building their initial portfolio.
+                    </div>
+                </div>
+            </div>
+
+            <div class="wizard-step">
+                <div class="step-header">
+                    <span class="step-badge">4/4</span>
+                    <span class="step-label">Usage Rights</span>
+                </div>
+                <div class="step-body">
+                    <div class="toggle-list">
+                        <label class="toggle-row">
+                            <div class="row-info">
+                                <span class="row-title">Paid Ads (30 Days)</span>
+                                <span class="row-badge">+30%</span>
+                            </div>
+                            <div class="switch">
+                                <input type="checkbox" name="usage" value="ads_30">
+                                <span class="slider round"></span>
+                            </div>
+                        </label>
+                        
+                        <label class="toggle-row">
+                            <div class="row-info">
+                                <span class="row-title">Paid Ads (90 Days)</span>
+                                <span class="row-badge">+50%</span>
+                            </div>
+                            <div class="switch">
+                                <input type="checkbox" name="usage" value="ads_90">
+                                <span class="slider round"></span>
+                            </div>
+                        </label>
+
+                        <label class="toggle-row">
+                            <div class="row-info">
+                                <span class="row-title">Paid Ads (1 Year)</span>
+                                <span class="row-badge">+100%</span>
+                            </div>
+                            <div class="switch">
+                                <input type="checkbox" name="usage" value="ads_365">
+                                <span class="slider round"></span>
+                            </div>
+                        </label>
+
+                        <label class="toggle-row highlight-row">
+                            <div class="row-info">
+                                <span class="row-title">Perpetual Buyout</span>
+                                <span class="row-badge premium">+300%</span>
+                            </div>
+                            <div class="switch">
+                                <input type="checkbox" name="usage" value="perpetual">
+                                <span class="slider round"></span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
         </form>
     </div>
 
-    <!-- Results Section -->
-    <div class="modern-card" id="resultSegment" style="display: none; margin-top: 2rem; border-color: var(--success-color);">
-        <div class="ui stackable grid middle aligned">
-            <div class="eight wide column">
-                <div class="ui tiny header" style="text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px;">Estimated Range</div>
-                <div style="font-size: 3.5rem; line-height: 1;" class="result-gradient-text">
-                    $<span id="minPrice">0</span> - $<span id="maxPrice">0</span>
+    <div class="result-panel">
+        <div class="sticky-wrapper">
+            <div class="quote-card">
+                <div class="card-header">
+                    <span class="live-tag"><span class="pulse"></span> Live Estimate</span>
+                    <span class="verified-tag"><i class="fas fa-check-double"></i> Verified</span>
                 </div>
-                <p style="color: var(--text-muted); margin-top: 10px;">Based on your niche & usage rights.</p>
-            </div>
-            <div class="eight wide column right aligned computer only">
-                <button class="ui button basic circular" id="downloadQuoteBtn">
-                    <i class="file pdf outline icon"></i> Download Quote
-                </button>
-            </div>
-            <!-- Mobile only button duplicate -->
-            <div class="sixteen wide column mobile only center aligned">
-                <button class="ui button basic circular fluid" id="downloadQuoteBtnMobile">
-                    <i class="file pdf outline icon"></i> Download Quote
-                </button>
-            </div>
-        </div>
 
-        <div class="ui divider"></div>
-
-        <!-- Pitch Generator -->
-        <h4 class="ui header" style="color: var(--text-main);">
-            <i class="magic icon" style="color: var(--primary-color);"></i>
-            Pitch Generator
-        </h4>
-        
-        <div class="ui form">
-            <div class="three fields">
-                <div class="field">
-                    <input type="text" id="pitchBrand" placeholder="Brand Name (e.g. Nike)">
-                </div>
-                <div class="field">
-                    <input type="text" id="pitchProduct" placeholder="Product Type (e.g. Sneakers)">
-                </div>
-                <div class="field">
-                     <div class="ui selection dropdown" id="moodDropdown">
-                        <input type="hidden" name="mood" id="pitchMood" value="professional">
-                        <i class="dropdown icon"></i>
-                        <div class="default text">Select Mood</div>
-                        <div class="menu">
-                            <div class="item" data-value="professional">Professional</div>
-                            <div class="item" data-value="casual">Casual / Friendly</div>
-                            <div class="item" data-value="bold">Bold / High Energy</div>
-                        </div>
+                <div class="price-section">
+                    <div class="price-label">Fair Market Range</div>
+                    <div class="price-value">
+                        <span class="currency">$</span><span id="minPrice">150</span>
+                        <span class="separator">–</span>
+                        <span class="currency">$</span><span id="maxPrice">180</span>
+                    </div>
+                    <div class="price-context">
+                        Based on <strong>32k+ data points</strong> matching your specific niche & experience.
                     </div>
                 </div>
-            </div>
-            
-            <button class="ui basic fluid button" id="generatePitchBtn" style="border-radius: 12px; color: var(--text-main); border-color: var(--border-color);">
-                Draft Email for Brand
-            </button>
-        </div>
 
-        <div class="ui form" id="pitchArea" style="display: none; margin-top: 1rem;">
-            <div class="field">
-                <textarea rows="8" id="pitchText"></textarea>
-            </div>
-            <div class="field">
-                <div class="ui action input fluid">
-                    <input type="email" placeholder="Enter email to save this calculation..." id="leadEmail">
-                    <button class="ui button violet" id="saveLeadBtn">Save Result</button>
+                <div class="platform-icons">
+                    <i class="fab fa-tiktok"></i>
+                    <i class="fab fa-instagram"></i>
+                    <i class="fab fa-youtube"></i>
+                    <span class="platform-text">Social Optimized</span>
                 </div>
+
+                <div class="card-actions">
+                    <button class="btn-pitch" id="generatePitchBtn">
+                        <i class="fas fa-magic"></i> Generate Pitch
+                    </button>
+                    <button class="btn-download" id="downloadQuoteBtn">
+                        <i class="fas fa-download"></i> PDF Quote
+                    </button>
+                </div>
+            </div>
+
+            <div id="pitchPanel" class="pitch-container hidden">
+                <div class="pitch-head">
+                    <h4>Pitch Draft</h4>
+                    <button class="close-pitch"><i class="fas fa-times"></i></button>
+                </div>
+                <textarea id="pitchText" readonly spellcheck="false"></textarea>
+                <button class="btn-copy" id="copyPitchBtn">Copy to Clipboard</button>
             </div>
         </div>
     </div>
 
 </div>
 
+<div class="mobile-footer">
+    <div class="footer-price">
+        <span class="label">Estimate</span>
+        <span class="val">$<span id="mobileMin">150</span> - $<span id="mobileMax">180</span></span>
+    </div>
+    <button class="footer-btn" onclick="document.querySelector('.result-panel').scrollIntoView({behavior:'smooth'})">
+        Details
+    </button>
+</div>
 {% endblock %}
 
 {% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="/static/js/main.js"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
 {% endblock %}

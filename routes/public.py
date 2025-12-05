@@ -1,4 +1,4 @@
-from flask import render_template, request, jsonify
+from flask import render_template, request, jsonify, current_app
 from extensions import db, limiter
 from models import Lead, PricingConfig, PitchTemplate
 from schemas import CalculationSchema, LeadSchema
@@ -6,7 +6,6 @@ from marshmallow import ValidationError
 import random
 
 def get_price_config(key, default=0.0):
-    """Helper to safely fetch pricing variables from DB."""
     try:
         conf = PricingConfig.query.filter_by(key=key).first()
         return float(conf.value) if conf else default
@@ -32,32 +31,36 @@ def register(app):
             return jsonify(err.messages), 400
 
         try:
-            # Extract Data
             c_type = data['content_type']
             exp_level = data['experience_level']
             niche = data['niche']
             usage_list = data['usage_rights']
             
-            # Logic
-            base_rate = get_price_config(f'base_{c_type}', 50.0)
-            exp_mult = get_price_config(f'mult_exp_{exp_level}', 0.0)
-            niche_mult = get_price_config(f'mult_niche_{niche}', 0.0)
+            # 1. Base Rate
+            base_rate = get_price_config(f'base_{c_type}', 150.0)
             
-            adjusted_base = base_rate + (base_rate * exp_mult) + (base_rate * niche_mult)
+            # 2. Multipliers (Experience & Niche)
+            # Logic: Base * ExpFactor * NicheFactor
+            exp_factor = get_price_config(f'mult_exp_{exp_level}', 1.0)
+            niche_factor = get_price_config(f'mult_niche_{niche}', 1.0)
             
-            total_usage_fee = 0.0
+            adjusted_base = base_rate * exp_factor * niche_factor
+            
+            # 3. Usage Rights (Add-ons)
+            # Logic: AdjustedBase + (AdjustedBase * UsageSum)
+            total_usage_percent = 0.0
             for right in usage_list:
-                u_percent = get_price_config(f'usage_{right}', 0.0)
-                total_usage_fee += (adjusted_base * u_percent)
+                # Key format: usage_ads_30, usage_organic, etc.
+                total_usage_percent += get_price_config(f'usage_{right}', 0.0)
             
-            total_val = adjusted_base + total_usage_fee
+            total_val = adjusted_base + (adjusted_base * total_usage_percent)
             
             return jsonify({
                 'min_price': int(total_val),
                 'max_price': int(total_val * 1.2)
             })
         except Exception as e:
-            app.logger.error(f"Calculation Error: {str(e)}")
+            current_app.logger.error(f"Calculation Error: {str(e)}")
             return jsonify({"error": "Internal calculation error"}), 500
 
     @app.route('/api/pitch/generate', methods=['POST'])
@@ -76,7 +79,7 @@ def register(app):
                 
             selected = random.choice(templates)
             return jsonify({"content": selected.content})
-        except Exception as e:
+        except Exception:
             return jsonify({"error": "Could not generate pitch"}), 500
 
     @app.route('/api/lead', methods=['POST'])
@@ -93,6 +96,6 @@ def register(app):
             return jsonify({'status': 'success'})
         except ValidationError as err:
             return jsonify(err.messages), 400
-        except Exception as e:
+        except Exception:
             db.session.rollback()
             return jsonify({'error': 'Database error'}), 500

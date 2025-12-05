@@ -3,13 +3,22 @@ from marshmallow import Schema, fields, validate
 class CalculationSchema(Schema):
     content_type = fields.Str(
         required=True, 
-        validate=validate.OneOf(["video", "photo", "testimonial"], error="Invalid content type selected.")
+        validate=validate.OneOf([
+            "video_1", "video_3", "photos_5", "video_1_hooks_3", "raw"
+        ], error="Invalid content type selected.")
     )
     experience_level = fields.Str(
         required=True,
-        validate=validate.OneOf(["beginner", "intermediate", "pro"], error="Invalid experience level.")
+        validate=validate.OneOf([
+            "beginner", "intermediate", "pro"
+        ], error="Invalid experience level.")
     )
-    niche = fields.Str(required=True, validate=validate.Length(min=1))
+    niche = fields.Str(
+        required=True, 
+        validate=validate.OneOf([
+            "lifestyle", "beauty", "health", "home", "tech", "finance"
+        ], error="Invalid niche.")
+    )
     # Validates that usage_rights is a list of strings
     usage_rights = fields.List(fields.Str(), missing=[])
 

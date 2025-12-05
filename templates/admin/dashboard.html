@@ -212,37 +212,112 @@
 
     <!-- PRICING TAB -->
     {% if active_tab == 'pricing' %}
-    <h2 class="ui header">Dynamic Pricing Configuration</h2>
-    <div class="ui warning message">
-        <i class="attention icon"></i> Changing these values immediately affects all public calculations.
-    </div>
+    <h2 class="ui header">
+        <i class="tags icon"></i>
+        <div class="content">
+            Pricing Configuration
+            <div class="sub header">Manage base rates, multipliers, and add-on fees.</div>
+        </div>
+    </h2>
+
     <form action="{{ url_for('update_pricing') }}" method="POST" class="ui form">
-        <table class="ui definition table">
+        
+        <div class="ui hidden divider"></div>
+
+        <h4 class="ui dividing header teal">
+            <i class="dollar sign icon"></i> Base Rates
+        </h4>
+        <div class="ui three column grid">
+            {% for conf in pricing_configs if conf.category == 'base' %}
+            <div class="column">
+                <div class="ui card fluid">
+                    <div class="content">
+                        <div class="header" style="font-size: 1rem;">{{ conf.description }}</div>
+                        <div class="meta">{{ conf.key }}</div>
+                        <div class="description" style="margin-top: 10px;">
+                            <div class="ui left icon input fluid">
+                                <i class="dollar sign icon"></i>
+                                <input type="number" step="0.01" name="conf_{{ conf.key }}" value="{{ conf.value }}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="ui hidden divider"></div>
+
+        <h4 class="ui dividing header blue">
+            <i class="chart line icon"></i> Multipliers (x Factor)
+        </h4>
+        <div class="ui info message tiny">
+            <i class="info circle icon"></i>
+            Values are multipliers. <b>1.0</b> = No Change, <b>1.5</b> = +50%, <b>0.8</b> = -20%.
+        </div>
+        <div class="ui four column grid">
+            {% for conf in pricing_configs if conf.category == 'multiplier' %}
+            <div class="column">
+                <div class="field">
+                    <label>{{ conf.description }}</label>
+                    <div class="ui right labeled input">
+                        <input type="number" step="0.01" name="conf_{{ conf.key }}" value="{{ conf.value }}">
+                        <div class="ui basic label">x</div>
+                    </div>
+                    <div class="text-muted tiny" style="font-size: 0.8em; color: #888;">{{ conf.key }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="ui hidden divider"></div>
+
+        <h4 class="ui dividing header violet">
+            <i class="copy icon"></i> Usage Rights (Add-ons)
+        </h4>
+        <div class="ui info message tiny">
+            <i class="info circle icon"></i>
+            Values are percentages added to the Adjusted Base. <b>0.30</b> = +30%, <b>3.00</b> = +300%.
+        </div>
+        <table class="ui celled table striped">
             <thead>
-                <tr><th>Variable</th><th>Value</th><th>Description</th></tr>
+                <tr>
+                    <th>Right Name</th>
+                    <th style="width: 200px;">Value (Decimal)</th>
+                    <th>Calculated Impact</th>
+                </tr>
             </thead>
             <tbody>
-                {% for conf in pricing_configs %}
+                {% for conf in pricing_configs if conf.category == 'usage' %}
                 <tr>
-                    <td>{{ conf.key }}</td>
+                    <td>
+                        <strong>{{ conf.description }}</strong>
+                        <div class="text-muted tiny">{{ conf.key }}</div>
+                    </td>
                     <td>
                         <div class="ui input fluid">
                             <input type="number" step="0.01" name="conf_{{ conf.key }}" value="{{ conf.value }}">
                         </div>
                     </td>
-                    <td>{{ conf.description }}</td>
+                    <td>
+                        <span class="ui label basic">
+                            +{{ (conf.value * 100)|int }}%
+                        </span>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
-            <tfoot class="full-width">
-                <tr>
-                    <th></th>
-                    <th colspan="2">
-                        <button class="ui primary button" type="submit">Save Changes</button>
-                    </th>
-                </tr>
-            </tfoot>
         </table>
+
+        <div class="ui divider"></div>
+
+        <div class="ui container center aligned" style="padding-bottom: 50px;">
+            <button class="ui button huge primary" type="submit">
+                <i class="save icon"></i> Save All Configurations
+            </button>
+            <a href="{{ url_for('admin_dashboard', tab='pricing') }}" class="ui button huge basic">Cancel</a>
+        </div>
+
     </form>
     {% endif %}
 

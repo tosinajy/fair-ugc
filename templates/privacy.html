@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Privacy Policy | FairUGC{% endblock %}
+
+{% block content %}
+<nav class="app-navbar">
+    <div class="nav-content">
+        <a href="{{ url_for('index') }}" class="nav-brand" style="text-decoration:none;">
+            <div class="logo-icon"><i class="fas fa-calculator"></i></div>
+            <span class="brand-text">FairUGC</span>
+        </a>
+        <button class="theme-toggle-btn" id="themeToggle" title="Toggle Dark Mode">
+            <i class="fas fa-moon"></i>
+        </button>
+    </div>
+</nav>
+
+<div class="main-container" style="display: block; max-width: 800px;">
+    <div class="ui segment" style="padding: 3rem; margin-top: 2rem;">
+        <h1 class="ui header">Privacy Policy</h1>
+        <p class="meta">Last Updated: October 2025</p>
+        
+        <h3>1. Introduction</h3>
+        <p>FairUGC ("we", "us", or "our") respects your privacy. This Privacy Policy explains how we collect, use, and protect your information when you use our website.</p>
+
+        <h3>2. Information We Collect</h3>
+        <p>We collect minimal information necessary to provide our services:</p>
+        <ul>
+            <li><strong>Usage Data:</strong> We may collect anonymous data about how the calculator is used to improve our algorithms.</li>
+            <li><strong>Email Addresses:</strong> If you choose to unlock detailed reports or download PDFs, we collect your email address. This is used to send you the requested information and occasional updates. You may unsubscribe at any time.</li>
+        </ul>
+
+        <h3>3. How We Use Your Information</h3>
+        <p>We use your information to:</p>
+        <ul>
+            <li>Provide and maintain the FairUGC calculator.</li>
+            <li>Send you the content you requested (e.g., PDF quotes).</li>
+            <li>Analyze usage trends to improve user experience.</li>
+        </ul>
+
+        <h3>4. Data Protection</h3>
+        <p>We implement appropriate technical and organizational measures to protect your personal data against unauthorized access, alteration, disclosure, or destruction.</p>
+
+        <h3>5. Contact Us</h3>
+        <p>If you have any questions about this Privacy Policy, please contact us at <a href="mailto:fairugc@panachora.net">fairugc@panachora.net</a>.</p>
+    </div>
+</div>
+{% endblock %}

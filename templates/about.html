@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}About Us | FairUGC{% endblock %}
+
+{% block content %}
+<nav class="app-navbar">
+    <div class="nav-content">
+        <a href="{{ url_for('index') }}" class="nav-brand" style="text-decoration:none;">
+            <div class="logo-icon"><i class="fas fa-calculator"></i></div>
+            <span class="brand-text">FairUGC</span>
+        </a>
+        <button class="theme-toggle-btn" id="themeToggle" title="Toggle Dark Mode">
+            <i class="fas fa-moon"></i>
+        </button>
+    </div>
+</nav>
+
+<div class="main-container" style="display: block; max-width: 800px;">
+    <div class="ui segment" style="padding: 3rem; margin-top: 2rem;">
+        <h1 class="ui header">Our Story</h1>
+        <p class="ui text large">
+            It started in a coffee shop in Atlanta, Georgia.
+        </p>
+        <p>
+            I'm <strong>Ajayi Oluwatosin</strong>, a web developer and digital enthusiast. I have a circle of incredibly talented friends here in Atlanta—photographers, video editors, and UGC creators—who constantly produce amazing work for brands.
+        </p>
+        <p>
+            But I noticed a recurring problem. Despite their talent, they were constantly stressing over pricing.
+        </p>
+        <blockquote>
+            "Should I charge for usage rights?" <br>
+            "Is $150 too much for a video?" <br>
+            "How do I factor in paid ads?"
+        </blockquote>
+        <p>
+            They were either undercharging significantly or losing clients because they couldn't justify their rates confidently. I got tired of seeing my friends—and creators like them—undervalued simply because the market data was opaque.
+        </p>
+        <p>
+            So, I built <strong>FairUGC</strong>.
+        </p>
+        <p>
+            I wanted to create a tool that strips away the guesswork. A calculator backed by real market data, standard industry multipliers, and clear usage rights logic. It's designed to give creators the confidence to say, <em>"This is my rate, and here is exactly why."</em>
+        </p>
+        <p>
+            This tool is for every creator in Atlanta and beyond who deserves to be paid fairly for their creativity.
+        </p>
+        
+        <div class="ui divider"></div>
+        
+        <h3>Get in Touch</h3>
+        <p>
+            Have feedback, feature requests, or just want to say hi? <br>
+            <strong>Email:</strong> <a href="mailto:fairugc@panachora.net">fairugc@panachora.net</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

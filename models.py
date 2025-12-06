@@ -26,14 +26,66 @@ class Role(db.Model):
     def has_permission(self, perm_slug):
         return any(p.slug == perm_slug for p in self.permissions)
 
-class PricingConfig(db.Model):
-    __tablename__ = 'pricing_config'
+# --- PRICING MODELS ---
+
+class BaseRate(db.Model):
+    __tablename__ = 'base_rates'
     id = db.Column(db.Integer, primary_key=True)
-    key = db.Column(db.String(50), unique=True, nullable=False)
-    value = db.Column(db.Float, nullable=False)
-    category = db.Column(db.String(50))
+    slug = db.Column(db.String(50), unique=True, nullable=False)
+    name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(200))
+    icon_class = db.Column(db.String(50), default='fas fa-video')
+    base_price = db.Column(db.Integer, nullable=False)
+    sort_order = db.Column(db.Integer, default=0)
     updated_by = db.Column(db.String(100))
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+class NicheMultiplier(db.Model):
+    __tablename__ = 'niche_multipliers'
+    id = db.Column(db.Integer, primary_key=True)
+    slug = db.Column(db.String(50), unique=True, nullable=False)
+    name = db.Column(db.String(100), nullable=False)
+    multiplier = db.Column(db.Float, nullable=False, default=1.0)
+    logic_note = db.Column(db.String(200))
+    sort_order = db.Column(db.Integer, default=0)
+    updated_by = db.Column(db.String(100))
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+class ExperienceMultiplier(db.Model):
+    __tablename__ = 'experience_multipliers'
+    id = db.Column(db.Integer, primary_key=True)
+    slug = db.Column(db.String(50), unique=True, nullable=False)
+    name = db.Column(db.String(100), nullable=False)
+    years_range = db.Column(db.String(50))
+    description = db.Column(db.String(200))
+    multiplier = db.Column(db.Float, nullable=False, default=1.0)
+    sort_order = db.Column(db.Integer, default=0)
+    updated_by = db.Column(db.String(100))
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+class UsageRight(db.Model):
+    __tablename__ = 'usage_rights'
+    id = db.Column(db.Integer, primary_key=True)
+    slug = db.Column(db.String(50), unique=True, nullable=False)
+    name = db.Column(db.String(100), nullable=False)
+    multiplier = db.Column(db.Float, nullable=False, default=0.0)
+    is_premium = db.Column(db.Boolean, default=False)
+    sort_order = db.Column(db.Integer, default=0)
+    updated_by = db.Column(db.String(100))
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+class AuditLog(db.Model):
+    __tablename__ = 'audit_logs'
+    id = db.Column(db.Integer, primary_key=True)
+    table_name = db.Column(db.String(50))
+    record_slug = db.Column(db.String(50))
+    action = db.Column(db.String(50))
+    old_value = db.Column(db.Text)
+    new_value = db.Column(db.Text)
+    changed_by = db.Column(db.String(100))
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+# --- CONTENT MODELS ---
 
 class PitchTemplate(db.Model):
     __tablename__ = 'pitch_templates'
@@ -42,6 +94,9 @@ class PitchTemplate(db.Model):
     mood = db.Column(db.String(50)) 
     content = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    # Added fields
+    updated_by = db.Column(db.String(100))
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 class User(db.Model, UserMixin):
     __tablename__ = 'users'

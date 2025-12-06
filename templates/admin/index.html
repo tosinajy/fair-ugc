@@ -1,0 +1,26 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block admin_content %}
+<div class="page-header">
+    <div class="page-title">Overview</div>
+</div>
+
+<div class="ui grid">
+    <div class="four wide column">
+        <div class="card-panel">
+            <div class="ui statistic">
+                <div class="value">{{ calc_count }}</div>
+                <div class="label">Total Calculations</div>
+            </div>
+        </div>
+    </div>
+    <div class="four wide column">
+        <div class="card-panel">
+            <div class="ui statistic">
+                <div class="value">{{ lead_count }}</div>
+                <div class="label">Leads Captured</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

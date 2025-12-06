@@ -1,0 +1,125 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block admin_content %}
+<div class="page-header">
+    <div class="page-title">Pricing Engine</div>
+</div>
+
+<!-- Base Rates Table -->
+<div class="card-panel">
+    <h3 class="ui header dividing">Base Rates (Content Types)</h3>
+    <form action="{{ url_for('update_pricing_table', table_type='base') }}" method="POST">
+        <table class="ui celled table">
+            <thead>
+                <tr>
+                    <th>Content Type</th>
+                    <th>Description</th>
+                    <th>Base Price ($)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in base_rates %}
+                <tr>
+                    <td>{{ item.name }} <br> <small style="color:var(--text-muted)">{{ item.slug }}</small></td>
+                    <td>{{ item.description }}</td>
+                    <td style="width: 150px;">
+                        <div class="ui input fluid">
+                            <input type="number" name="price_{{ item.id }}" value="{{ item.base_price }}">
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button class="ui button primary" type="submit">Update Base Rates</button>
+    </form>
+</div>
+
+<!-- Niche Multipliers -->
+<div class="card-panel">
+    <h3 class="ui header dividing">Niche Multipliers</h3>
+    <form action="{{ url_for('update_pricing_table', table_type='niche') }}" method="POST">
+        <table class="ui celled table">
+            <thead>
+                <tr>
+                    <th>Niche Category</th>
+                    <th>Logic Note</th>
+                    <th>Multiplier (1.0 = 100%)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in niches %}
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.logic_note }}</td>
+                    <td style="width: 150px;">
+                        <div class="ui input fluid">
+                            <input type="number" step="0.01" name="mult_{{ item.id }}" value="{{ item.multiplier }}">
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button class="ui button primary" type="submit">Update Niches</button>
+    </form>
+</div>
+
+<!-- Experience Multipliers -->
+<div class="card-panel">
+    <h3 class="ui header dividing">Experience Levels</h3>
+    <form action="{{ url_for('update_pricing_table', table_type='exp') }}" method="POST">
+        <table class="ui celled table">
+            <thead>
+                <tr>
+                    <th>Level</th>
+                    <th>Years Range</th>
+                    <th>Multiplier</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in exps %}
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.years_range }}</td>
+                    <td style="width: 150px;">
+                        <div class="ui input fluid">
+                            <input type="number" step="0.01" name="mult_{{ item.id }}" value="{{ item.multiplier }}">
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button class="ui button primary" type="submit">Update Experience</button>
+    </form>
+</div>
+
+<!-- Usage Rights -->
+<div class="card-panel">
+    <h3 class="ui header dividing">Usage Rights</h3>
+    <form action="{{ url_for('update_pricing_table', table_type='usage') }}" method="POST">
+        <table class="ui celled table">
+            <thead>
+                <tr>
+                    <th>Usage Right</th>
+                    <th>Multiplier (0.3 = +30%)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in usages %}
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td style="width: 150px;">
+                        <div class="ui input fluid">
+                            <input type="number" step="0.01" name="mult_{{ item.id }}" value="{{ item.multiplier }}">
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button class="ui button primary" type="submit">Update Usage Rights</button>
+    </form>
+</div>
+{% endblock %}

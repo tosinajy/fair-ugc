@@ -1,0 +1,73 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block admin_content %}
+<div class="page-header">
+    <div class="page-title">Pitch Templates</div>
+</div>
+
+<!-- Add Pitch -->
+<div class="card-panel">
+    <h4 class="ui header">Add New Draft</h4>
+    <form class="ui form" action="{{ url_for('add_pitch') }}" method="POST">
+        <div class="two fields">
+            <div class="field">
+                <label>Template Name</label>
+                <input type="text" name="name" placeholder="e.g. Agency Approach" required>
+            </div>
+            <div class="field">
+                <label>Mood</label>
+                <select class="ui dropdown" name="mood">
+                    <option value="professional">Professional</option>
+                    <option value="casual">Casual</option>
+                    <option value="bold">Bold</option>
+                </select>
+            </div>
+        </div>
+        <div class="field">
+            <label>Draft Content</label>
+            <textarea name="content" rows="4" placeholder="Use {brand_name} and {product_type} as placeholders." required></textarea>
+        </div>
+        <button class="ui button primary" type="submit">Create Template</button>
+    </form>
+</div>
+
+<!-- List Pitches -->
+<div class="card-panel">
+    <table class="ui celled table">
+        <thead>
+            <tr>
+                <th>Mood</th>
+                <th>Name</th>
+                <th>Content Preview</th>
+                <th>Updated By</th>
+                <th>Last Update</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pitch in pitches %}
+            <tr>
+                <td>
+                    <div class="ui label {{ 'blue' if pitch.mood == 'professional' else ('teal' if pitch.mood == 'casual' else 'violet') }}">
+                        {{ pitch.mood|title }}
+                    </div>
+                </td>
+                <td><strong>{{ pitch.name }}</strong></td>
+                <td style="color: #666; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    {{ pitch.content }}
+                </td>
+                <td>{{ pitch.updated_by }}</td>
+                <td>{{ pitch.updated_at.strftime('%Y-%m-%d') if pitch.updated_at else '-' }}</td>
+                <td>
+                    <a href="{{ url_for('delete_pitch', pitch_id=pitch.id) }}" class="ui mini red button icon">
+                        <i class="trash icon"></i>
+                    </a>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6">No templates found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

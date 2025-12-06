@@ -1,0 +1,36 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block admin_content %}
+<div class="page-header">
+    <div class="page-title">Audit Logs</div>
+</div>
+
+<div class="card-panel">
+    <table class="ui celled table striped" style="font-size: 0.9rem;">
+        <thead>
+            <tr>
+                <th>Time</th>
+                <th>User</th>
+                <th>Table</th>
+                <th>Record</th>
+                <th>Action</th>
+                <th>Change</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in audit_logs %}
+            <tr>
+                <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>{{ log.changed_by }}</td>
+                <td>{{ log.table_name }}</td>
+                <td>{{ log.record_slug }}</td>
+                <td><div class="ui tiny label">{{ log.action }}</div></td>
+                <td>{{ log.old_value }} &rarr; <b>{{ log.new_value }}</b></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6">No logs found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

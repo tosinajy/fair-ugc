@@ -1,0 +1,62 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block admin_content %}
+<div class="page-header">
+    <div class="page-title">Role Management</div>
+</div>
+
+<div class="card-panel">
+    <h4 class="ui header">Add New Role</h4>
+    <form class="ui form" action="{{ url_for('add_role') }}" method="POST">
+        <div class="field">
+            <label>Role Name</label>
+            <input type="text" name="name" placeholder="e.g. Moderator" required style="max-width: 300px;">
+        </div>
+        <div class="grouped fields">
+            <label>Permissions:</label>
+            {% for perm in permissions %}
+            <div class="field">
+                <div class="ui checkbox">
+                    <input type="checkbox" name="permissions" value="{{ perm.id }}">
+                    <label>{{ perm.description }} ({{ perm.slug }})</label>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <button class="ui button primary" type="submit">Create Role</button>
+    </form>
+</div>
+
+<div class="card-panel">
+    <table class="ui celled table">
+        <thead>
+            <tr>
+                <th>Role</th>
+                <th>Permissions</th>
+                <th>Updated By</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for role in roles %}
+            <tr>
+                <td><strong>{{ role.name }}</strong></td>
+                <td>
+                    {% for perm in role.permissions %}
+                        <div class="ui tiny basic label">{{ perm.slug }}</div>
+                    {% endfor %}
+                </td>
+                <td>{{ role.updated_by }}</td>
+                <td>
+                    {% if role.name != 'admin' %}
+                    <a href="{{ url_for('delete_role', role_id=role.id) }}" class="ui mini red button">Delete</a>
+                    {% else %}
+                    <span class="ui disabled label">System</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

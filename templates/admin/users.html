@@ -1,0 +1,78 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block admin_content %}
+<div class="page-header">
+    <div class="page-title">User Management</div>
+</div>
+
+<div class="card-panel">
+    <h4 class="ui header">Add New User</h4>
+    <form class="ui form" action="{{ url_for('add_user') }}" method="POST">
+        <div class="three fields">
+            <div class="field">
+                <label>Username</label>
+                <input type="text" name="username" required>
+            </div>
+            <div class="field">
+                <label>Password</label>
+                <input type="password" name="password" required>
+            </div>
+            <div class="field">
+                <label>Role</label>
+                <select class="ui dropdown" name="role_id">
+                    {% for role in roles %}
+                    <option value="{{ role.id }}">{{ role.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <button class="ui button primary" type="submit">Create User</button>
+    </form>
+</div>
+
+<div class="card-panel">
+    <table class="ui celled table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Role</th>
+                <th>Updated By</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if users_paginated %}
+                {% for user in users_paginated.items %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.username }}</td>
+                    <td><div class="ui label">{{ user.role.name }}</div></td>
+                    <td>{{ user.updated_by }}</td>
+                    <td>
+                        {% if user.id != current_user.id %}
+                        <a href="{{ url_for('delete_user', user_id=user.id) }}" class="ui mini red button">Delete</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            {% endif %}
+        </tbody>
+    </table>
+
+    <!-- Pagination -->
+    {% if users_paginated and users_paginated.pages > 1 %}
+    <div class="ui pagination menu">
+        <a class="item {{ 'disabled' if not users_paginated.has_prev }}" href="{{ url_for('admin_users', page=users_paginated.prev_num) }}">Prev</a>
+        {% for page_num in users_paginated.iter_pages() %}
+            {% if page_num %}
+                <a class="item {{ 'active' if page_num == users_paginated.page }}" href="{{ url_for('admin_users', page=page_num) }}">{{ page_num }}</a>
+            {% else %}
+                <span class="item disabled">...</span>
+            {% endif %}
+        {% endfor %}
+        <a class="item {{ 'disabled' if not users_paginated.has_next }}" href="{{ url_for('admin_users', page=users_paginated.next_num) }}">Next</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,12 +1,9 @@
 from marshmallow import Schema, fields, validate
 
 class CalculationSchema(Schema):
-    content_type = fields.Str(
-        required=True, 
-        validate=validate.OneOf([
-            "video_1", "video_3", "photos_5", "video_1_hooks_3", "raw"
-        ], error="Invalid content type selected.")
-    )
+    # CHANGED: Now accepts a list of strings for mixed bundles
+    content_type = fields.List(fields.Str(), required=True, validate=validate.Length(min=1, error="Select at least one content type."))
+    
     experience_level = fields.Str(
         required=True,
         validate=validate.OneOf([

@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block styles %}
+<style>
+    /* Admin Specific Overrides reusing frontend vars */
+    .admin-wrapper {
+        display: flex;
+        flex: 1; /* Ensure it fills space correctly */
+        background-color: var(--bg-app);
+    }
+    
+    .admin-sidebar {
+        width: 250px;
+        background: white;
+        border-right: 1px solid var(--border-soft);
+        padding: 2rem 1rem;
+        display: flex;
+        flex-direction: column;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+    }
+
+    .admin-content {
+        flex: 1;
+        padding: 2rem;
+        max-width: 1200px;
+        overflow-y: auto; /* Allow content scrolling */
+        height: 100vh; /* Independent scroll area if needed, or let body handle it */
+    }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        margin-bottom: 8px;
+        border-radius: var(--radius-lg);
+        color: var(--text-muted);
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+
+    .nav-item:hover {
+        background: var(--bg-app);
+        color: var(--primary);
+    }
+
+    .nav-item.active {
+        background: #e0e7ff; /* Indigo-50 */
+        color: var(--primary);
+        font-weight: 600;
+    }
+
+    .nav-item i {
+        margin-right: 12px;
+        width: 20px;
+        text-align: center;
+    }
+
+    .admin-brand {
+        font-weight: 800;
+        font-size: 1.2rem;
+        color: var(--text-main);
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding-left: 10px;
+    }
+
+    .page-header {
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .page-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--text-main);
+    }
+
+    .card-panel {
+        background: var(--bg-card);
+        border: 1px solid var(--border-soft);
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        box-shadow: var(--shadow-card);
+        margin-bottom: 2rem;
+    }
+
+    /* Semantic UI overrides for cleaner look */
+    .ui.table { border-radius: var(--radius-lg); border: 1px solid var(--border-soft); }
+    .ui.button { border-radius: 8px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-wrapper">
+    <div class="admin-sidebar">
+        <div class="admin-brand">
+            <div class="logo-icon" style="width:28px; height:28px; font-size:0.8rem;"><i class="fas fa-lock"></i></div>
+            FairUGC Admin
+        </div>
+        
+        <nav>
+            <a href="{{ url_for('admin_dashboard') }}" class="nav-item {{ 'active' if active_page == 'dashboard' else '' }}">
+                <i class="fas fa-chart-line"></i> Dashboard
+            </a>
+            
+            {% if current_user.role.has_permission('can_manage_users') %}
+            <a href="{{ url_for('admin_users') }}" class="nav-item {{ 'active' if active_page == 'users' else '' }}">
+                <i class="fas fa-users"></i> Users
+            </a>
+            {% endif %}
+
+            {% if current_user.role.has_permission('can_manage_roles') %}
+            <a href="{{ url_for('admin_roles') }}" class="nav-item {{ 'active' if active_page == 'roles' else '' }}">
+                <i class="fas fa-user-shield"></i> Roles & Perms
+            </a>
+            {% endif %}
+
+            {% if current_user.role.has_permission('can_manage_pricing') %}
+            <a href="{{ url_for('admin_pricing') }}" class="nav-item {{ 'active' if active_page == 'pricing' else '' }}">
+                <i class="fas fa-tags"></i> Pricing Engine
+            </a>
+            <a href="{{ url_for('admin_pitches') }}" class="nav-item {{ 'active' if active_page == 'pitches' else '' }}">
+                <i class="fas fa-pen-nib"></i> Pitch Templates
+            </a>
+            {% endif %}
+
+            <a href="{{ url_for('admin_audit') }}" class="nav-item {{ 'active' if active_page == 'audit' else '' }}">
+                <i class="fas fa-history"></i> Audit Logs
+            </a>
+            
+            <div style="margin-top: auto; padding-top: 2rem; border-top: 1px solid var(--border-soft);">
+                <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px; padding-left: 10px;">
+                    Logged in as <strong>{{ current_user.username }}</strong>
+                </div>
+                <a href="{{ url_for('logout') }}" class="nav-item" style="color: #ef4444;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </nav>
+    </div>
+
+    <div class="admin-content">
+        {% block admin_content %}{% endblock %}
+    </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+<!-- Footer Removed for Admin Pages -->
+{% endblock %}
